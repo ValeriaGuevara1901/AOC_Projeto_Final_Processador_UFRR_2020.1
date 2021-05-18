@@ -1,0 +1,58 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.std_logic_arith.ALL;
+USE ieee.std_logic_unsigned.ALL;
+
+ENTITY fsm IS
+    PORT (
+				clk: IN std_logic;
+				inicio, bandeira : IN std_logic_;
+				PC_fsm:OUT std_logic_vector (10 DOWNTO 0)
+			);
+END fsm;
+
+ARCHITECTURE behavior OF fsm IS
+type estados is (repouso,ler,apagar,somar,subtrair,imprimir);
+signal estado_presente, estado_presente : estados := repouso;
+BEGIN
+--registro de estados
+     PROCESS (clk)
+		 BEGIN
+			  IF (clk'event and clk='1') THEN
+					estado_presente <= estado_seguinte;
+			  END IF;
+	 END PROCESS;
+	 
+--Logica do estado seguinte 
+PROCESS 
+	BEGIN
+		CASE (estado_presente) IS
+				WHEN repouso =>
+					IF inicio ='1' THEN
+						estado_seguinte <= ler;
+					ELSE
+						estado_presente <= repouso;
+						
+	--Ingresso dos dados nas entradas					
+					WHEN ler =>
+						estado_seguinte <= apagar;
+						
+	--As operações 
+					WHEN soma =>
+						estado_seguinte <= subtrair;
+						
+					WHEN subtrair =>
+						IF bandeira ='1' THEN
+							estado_seguinte <= soma;
+						ELSE
+							estado_presente <= imprimir;
+
+	--Os estados de impressao ou repouso
+					WHEN imprimir =>
+						estado_seguinte <= repouso;
+						
+					WHEN OTHERS =>
+						estado_seguinte <= repouso;
+
+		END CASE;
+END behavior;
